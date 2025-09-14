@@ -51,3 +51,39 @@ def cryptohash(msg):
             mix_in = rotate_left(mix_in, i+6)
         initial_state = xor(initial_state,mix_in)
     return initial_state.hex()
+
+m1 = b"\x00"
+print(pad(m1))
+m1 = b"\x1f"
+print(pad(m1))
+m1 = b"\x1f\x1f"
+print(pad(m1))
+m1 = b"\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f\x1f"
+print(pad(m1))
+
+m2 = b"\x1f"
+print(pad(m2))
+
+print("m1 =", m1.hex())
+print("m2 =", m2.hex())
+print(cryptohash(m1))
+print(cryptohash(m2))
+
+# Collision occur when m1 and m2 return the same hashed value from cryptohash()
+# Look at the func pad(), it will add bytes to msg, so I try multiple msg like above
+# First, I try with b"\x00", then pad() adds lots of "\x1f" for me.
+# => Try to input msg like "\x1f", then pad() adds lots of "\x1f" as expected.
+# So I try to input "\x1f\x1f". But pad() adds with "\x1e"
+# => I try again with differ input, and expected that pad() will return the same without adding any thing.
+# => Success
+# {"m1":"1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f","m2":"1f"}
+
+# $ telnet socket.cryptohack.org 13405
+# Trying 134.122.111.232...
+# Connected to socket.cryptohack.org.
+# Escape character is '^]'.
+# Can you help beta test our new CryptoHash? If you find a collision, we'll give you a flag!
+
+# Please send two hex encoded messages m1, m2 formatted in JSON: {"m1":"1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f","m2":"1f"}
+# {"flag": "Oh no! Looks like we have some more work to do... As promised, here's your flag: crypto{Always_add_padding_even_if_its_a_whole_block!!!}"}
+# Connection closed by foreign host.
